@@ -3,8 +3,8 @@ from sqlalchemy import (
     Integer,
     String,
     DateTime,
-    func,
 )
+from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from app.db import Base
 

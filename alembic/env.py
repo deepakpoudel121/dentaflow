@@ -3,20 +3,19 @@ from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import create_async_engine
 from alembic import context
 from app.db import Base
-from app.core import settings
-from app.models import *
+from app.models import Appointment, Patient # import every model file here
 from dotenv import load_dotenv
 import asyncio
+import os
 
 load_dotenv()
-
 
 config = context.config
 fileConfig(config.config_file_name)
 target_metadata = Base.metadata
 
 def get_url():
-    return settings.database_url
+    return os.getenv("DATABASE_URL")
 
 def run_migrations_offline():
     context.configure(
