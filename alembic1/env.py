@@ -5,9 +5,10 @@ from alembic import context
 from app.db import Base
 from app.core import settings
 from app.models import *
-
+from dotenv import load_dotenv
 import asyncio
 
+load_dotenv()
 
 
 config = context.config
