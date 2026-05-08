@@ -1,59 +1,49 @@
-from fastapi import APIRouter, Depends, Form
-from fastapi.responses import Response
-from app.db import get_db
+from fastapi import APIRouter, Depends, Form, Response
 from sqlalchemy.ext.asyncio import AsyncSession
-from pydantic import BaseModel
-from app.llm import classify_chain
-from twilio.rest import Client
+from app.db import get_db
+from app.core import logger, settings
+from app.services import get_or_create_patient, llm_service, generate_reply
 from twilio.twiml.messaging_response import MessagingResponse
-import os
 
 router = APIRouter(prefix='/appointment')
 
-class MessageSchema(BaseModel):
-    message_content: str
-
-
-
-
 @router.post("/webhook")
-async def get_appointments(Body: str = Form(...)):
-    incoming_msg = Body.strip().lower()
-
-    response_msg = await classify_chain.ainvoke({
-        "clinic_name": "Deepak's Clinic",
-        "message": incoming_msg
+async def receive_message(
+    Body: str = Form(...),
+    From: str = Form(...),
+    db: AsyncSession = Depends(get_db)
+):
+    logger.info("whatsapp message received", extra={
+        "from": From,
+        "message_length": len(Body)
     })
 
-    response = MessagingResponse()
-    message = response.message()
+    try:
+        # Step 1 — get or create patient
+        patient = await get_or_create_patient(From, db)
 
-    if response_msg.intent == "new_appointment":
-        content = "Please call 9865505 to book your appointment."
-    elif response_msg.intent == "other":
-        content = "Please specify your reason for the message."
-    else:
-        content = "Sorry, I didn't understand your request."
+        # Step 2 — classify intent
+        result = await llm_service(Body,settings.clinic_name)
+        logger.info("intent classified", extra={
+            "from": From,
+            "intent": result.intent,
+            "confidence": result.confidence
+        })
 
-    message.body(content)
+        # Step 3 — generate reply
+        content = generate_reply(result.intent)
 
-    return Response(
-        content=str(response),
-        media_type="application/xml"
-    )
+    except Exception as e:
+        logger.error("webhook processing failed", extra={
+            "from": From,
+            "error": str(e)
+        })
+        content = (
+            "Sorry, we're experiencing technical difficulties. "
+            "Please call us directly."
+        )
 
-
-# # from twilio.rest import Client
-
-# account_sid = os.getenv("TWILIO_ACCOUNT_SID")
-# auth_token = "TWILIO_ACCOUNT_TOKEN"
-# client = Client(account_sid, auth_token)
-
-# message = client.messages.create(
-#   from_='whatsapp:+14155238886',
-#   content_sid='HXb5b62575e6e4ff6129ad7c8efe1f983e',
-#   content_variables='{"1":"12/1","2":"3pm"}',
-#   to='whatsapp:+9779865505986'
-# )
-
-# print(message.sid)
+    # Step 4 — send TwiML response
+    twiml = MessagingResponse()
+    twiml.message(content)
+    return Response(content=str(twiml), media_type="application/xml")

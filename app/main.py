@@ -6,7 +6,18 @@ from app.core import logger
 import time
 from starlette.requests import Request
 from app.routes import appointment_router
-app = FastAPI()
+from app.services import start_scheduler, stop_scheduler
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    start_scheduler()
+    yield
+    stop_scheduler()
+
+
+
+app = FastAPI(lifespan = lifespan)
 app.include_router(appointment_router)
 
 

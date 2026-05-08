@@ -19,9 +19,8 @@ classify = load_prompt('prompts/classify_v1')
 classifier= ChatPromptTemplate.from_template(classify)
 
 llm = ChatMistralAI(model = 'mistral-small-latest')
-classifier_llm = llm.with_structured_output(IntentClassification)
 
-
-classify_chain = classifier | classifier_llm
+def get_chain():
+    return classifier | llm.with_structured_output(IntentClassification)
 
 
