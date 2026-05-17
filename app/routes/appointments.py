@@ -4,7 +4,7 @@ from app.db import get_db
 from app.core import logger, settings
 from app.services import get_or_create_patient, llm_service, generate_reply
 from twilio.twiml.messaging_response import MessagingResponse
-from app.schemas import ReplyInput
+
 
 router = APIRouter(prefix='/appointment')
 
@@ -24,23 +24,23 @@ async def receive_message(
         patient = await get_or_create_patient(From, db)
 
         # Step 2 — classify intent
-        result = await llm_service(Body,settings.clinic_name)
+        reply = await llm_service(Body,settings.clinic_name)
         logger.info("intent classified", extra={
             "from": From,
-            "intent": result.intent,
-            "confidence": result.confidence
+            "intent": reply.intent,
+            "confidence": reply.confidence
         })
-        input_msg = ReplyInput(
-            intent= result.intent,
-            clinic_name = settings.clinic_name,
-            patient_msg = Body,
-            patient_phone = From,
-            extracted_datetime = result.extracted_datetime,
-            patient_name = result.extracted_name 
 
-        )
         # Step 3 — generate reply
-        response = await generate_reply(input_msg)
+        response = await generate_reply(
+        clinic_name = settings.clinic_name,
+        intent = reply.intent,
+        extracted_datetime = reply.extracted_datetime,
+        extracted_name = reply.extracted_name,
+        patient_phone =reply.patient_phone,
+        patient_message= reply.patient_message,
+        clinic_hours= reply.clinic_hours
+        )
         
  
         if response.require_human:

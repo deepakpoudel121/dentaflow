@@ -11,14 +11,21 @@ async def llm_service(body, clinic) -> str:
         })
     return response
 
-async def generate_reply(reply: ReplyInput) -> ReplyOutput:
+async def generate_reply(
+    patient_message: str,
+    intent: str,
+    extracted_datetime: str | None,
+    extracted_name: str | None,
+    patient_phone: str,
+    clinic_name: str,
+) -> ReplyOutput:
     chain = reply_chain()
     response = await chain.ainvoke({
-        'clinic_name': reply.clinic_name,
-        'intent': reply.intent,
-        'extracted_datetime': reply.extracted_datetime,
-        'patient_name': reply.extracted_name,
-        'patient_phone': reply.patient_phone,
-        'patient_msg': reply.patient_msg
+        'clinic_name': clinic_name,
+        'intent': intent,
+        'extracted_datetime': extracted_datetime,
+        'patient_name': extracted_name,
+        'patient_phone': patient_phone,
+        'patient_msg': patient_message
     })
     return response
