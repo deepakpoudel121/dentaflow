@@ -49,7 +49,7 @@ async def receive_message(
             print("Create Appointment Function Runs")
         elif response.action.lower() == 'notify_staff':
             print("Notify Staff Func")
-        content = response.message
+        content = response.message.lower()
        
 
     except Exception as e:
