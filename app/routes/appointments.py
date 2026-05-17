@@ -4,6 +4,7 @@ from app.db import get_db
 from app.core import logger, settings
 from app.services import get_or_create_patient, llm_service, generate_reply
 from twilio.twiml.messaging_response import MessagingResponse
+from app.schemas import ReplyInput
 
 router = APIRouter(prefix='/appointment')
 
@@ -29,9 +30,27 @@ async def receive_message(
             "intent": result.intent,
             "confidence": result.confidence
         })
+        input_msg = ReplyInput(
+            intent= result.intent,
+            clinic_name = settings.clinic_name,
+            patient_msg = Body,
+            patient_phone = From,
+            extracted_datetime = result.extracted_datetime,
+            patient_name = result.patient_name | None
 
+        )
         # Step 3 — generate reply
-        content = generate_reply(result.intent)
+        response = await generate_reply(input_msg)
+        
+ 
+        if response.require_human:
+            print("Escalated to human")
+        if response.action.lower() == 'create_appointment':
+            print("Create Appointment Function Runs")
+        elif response.action.lower() == 'notify_staff':
+            print("Notify Staff Func")
+        content = response.message
+       
 
     except Exception as e:
         logger.error("webhook processing failed", extra={

@@ -1,1 +1,1 @@
-from .clients import get_chain
+from .clients import get_structured_chain

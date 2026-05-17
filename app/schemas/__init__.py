@@ -1,2 +1,2 @@
-from .llm import IntentClassification, ReplyOutput
+from .llm import IntentClassification, ReplyOutput, ReplyInput
 from .webhook import MessageSchema
