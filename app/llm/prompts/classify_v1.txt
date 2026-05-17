@@ -17,3 +17,6 @@ Also extract:
 
 Patient message:
 {message}
+
+
+If you dont have the patient name, set patient name to "Patient 1"

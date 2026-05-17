@@ -36,7 +36,7 @@ async def receive_message(
             patient_msg = Body,
             patient_phone = From,
             extracted_datetime = result.extracted_datetime,
-            patient_name = result.extracted_name | None
+            patient_name = result.extracted_name 
 
         )
         # Step 3 — generate reply
