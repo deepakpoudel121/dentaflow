@@ -31,7 +31,7 @@ async def receive_message(
             "confidence": reply.confidence
         })
 
-        # Step 3 — generate reply
+        logger.info("calling generate_reply", extra={"intent": reply.intent})
         response = await generate_reply(
         clinic_name = settings.clinic_name,
         intent = reply.intent,
@@ -42,8 +42,8 @@ async def receive_message(
         confidence = reply.confidence
         )
         
- 
-        if response.require_human:
+        logger.info("generate_reply succeeded", extra={"action": response.action})
+        if response.requires_human:
             print("Escalated to human")
         if response.action.lower() == 'create_appointment':
             print("Create Appointment Function Runs")
