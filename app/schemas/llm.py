@@ -19,11 +19,3 @@ class ReplyOutput(BaseModel):
     requires_human: Literal[True, False]
     action: Literal['none', 'create_appointment', 'notify_staff', 'collect_more_information']
 
-
-class ReplyInput(BaseModel):
-    intent: str
-    patient_msg: str
-    extracted_datetime: str | None
-    patient_name: str | None
-    patient_phone: str
-    clinic_name: str

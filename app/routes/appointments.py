@@ -39,7 +39,6 @@ async def receive_message(
         extracted_name = reply.extracted_name,
         patient_phone =From,
         patient_message= Body,
-        clinic_hours= reply.clinic_hours,
         confidence = reply.confidence
         )
         

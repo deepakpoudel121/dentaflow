@@ -18,6 +18,7 @@ async def generate_reply(
     extracted_name: str | None,
     patient_phone: str,
     clinic_name: str,
+    confidence:str
 ) -> ReplyOutput:
     chain = reply_chain()
     response = await chain.ainvoke({
@@ -26,6 +27,7 @@ async def generate_reply(
         'extracted_datetime': extracted_datetime,
         'patient_name': extracted_name,
         'patient_phone': patient_phone,
-        'patient_msg': patient_message
+        'patient_msg': patient_message,
+        'confidence': confidence
     })
     return response
