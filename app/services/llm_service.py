@@ -1,6 +1,6 @@
 from app.llm import get_structured_chain, reply_chain
 
-from app.schemas import ReplyInput, ReplyOutput
+from app.schemas import  ReplyOutput
 
 
 async def llm_service(body, clinic) -> str:
