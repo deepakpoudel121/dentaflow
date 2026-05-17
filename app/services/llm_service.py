@@ -3,7 +3,7 @@ from app.llm import get_structured_chain, reply_chain
 from app.schemas import  ReplyOutput
 
 
-async def llm_service(body, clinic) -> str:
+async def llm_service(body, clinic) -> dict:
     chain = get_structured_chain()
     response = await chain.ainvoke({
             "clinic_name": clinic,
@@ -18,7 +18,8 @@ async def generate_reply(
     extracted_name: str | None,
     patient_phone: str,
     clinic_name: str,
-    confidence:str
+    confidence:str,
+    history_convo:str
 ) -> ReplyOutput:
     chain = reply_chain()
     response = await chain.ainvoke({
@@ -28,6 +29,7 @@ async def generate_reply(
         'patient_name': extracted_name,
         'patient_phone': patient_phone,
         'patient_msg': patient_message,
-        'confidence': confidence
+        'confidence': confidence,
+        'history': history_convo
     })
     return response

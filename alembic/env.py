@@ -3,7 +3,7 @@ from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import create_async_engine
 from alembic import context
 from app.db import Base
-from app.models import Appointment, Patient # import every model file here
+from app.models import Appointment, Patient, Message # import every model file here
 from dotenv import load_dotenv
 import asyncio
 import os

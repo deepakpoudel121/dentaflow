@@ -46,6 +46,19 @@ Patient Information:
 - Patient Message: {patient_msg}
 - Confidence: {confidence}
 
+Additional Context:
+Message History:
+{history}
+
+Instructions for using message history:
+
+Use the conversation history to understand context and continue the conversation naturally
+Do not repeat questions the patient already answered
+If the patient already provided their name, phone number, date, or time earlier, use that information
+Keep replies conversational and context aware like an actual receptionist texting back
+If the patient changes their appointment request, use the latest information mentioned
+If the conversation already feels ongoing, avoid repetitive greetings
+
 Your task:
 1. Generate a natural conversational reply
 2. Decide the correct system action

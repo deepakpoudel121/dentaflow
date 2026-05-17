@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Form, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db import get_db
 from app.core import logger, settings
-from app.services import get_or_create_patient, llm_service, generate_reply
+from app.services import get_or_create_patient, llm_service, generate_reply, save_message, get_conversation_history
 from twilio.twiml.messaging_response import MessagingResponse
 
 
@@ -30,7 +30,7 @@ async def receive_message(
             "intent": reply.intent,
             "confidence": reply.confidence
         })
-
+        history = await get_conversation_history(patient.id, db)
         logger.info("calling generate_reply", extra={"intent": reply.intent})
         response = await generate_reply(
         clinic_name = settings.clinic_name,
@@ -39,7 +39,8 @@ async def receive_message(
         extracted_name = reply.extracted_name,
         patient_phone =From,
         patient_message= Body,
-        confidence = reply.confidence
+        confidence = reply.confidence,
+        history_convo = history
         )
         
         logger.info("generate_reply succeeded", extra={"action": response.action})
@@ -52,6 +53,9 @@ async def receive_message(
         content = response.message
        
 
+        await save_message(patient.id, "patient", Body, db)
+
+        await save_message(patient.id, "assistant", content, db)
     except Exception as e:
         logger.error("webhook processing failed", extra={
             "from": From,
