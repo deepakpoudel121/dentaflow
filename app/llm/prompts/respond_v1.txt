@@ -28,7 +28,7 @@ Patient Information:
 - Patient Name: {patient_name}
 - Patient Phone: {patient_phone}
 - Patient Message: {patient_msg}
-- Confidence: {confience}
+- Confidence: {confidence}
 
 Your task:
 1. Generate a natural conversational reply
